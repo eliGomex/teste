@@ -41,8 +41,18 @@ button:hover {
 }
 
 video {
-    display: none;
     width: 100%;
     max-width: 600px;
     margin: 20px 0;
+}
+
+#imagesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#imagesContainer img {
+    max-width: 200px;
+    margin: 10px;
 }
