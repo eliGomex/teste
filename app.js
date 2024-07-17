@@ -1,6 +1,6 @@
 // Registro do Service Worker
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
+    navigator.serviceWorker.register('/eligomex.github.io/service-worker.js')
         .then((registration) => {
             console.log('Service Worker registrado com sucesso:', registration);
         })
@@ -8,6 +8,7 @@ if ('serviceWorker' in navigator) {
             console.log('Falha ao registrar o Service Worker:', error);
         });
 }
+
 
 // Solicitar permissão para notificações
 function requestNotificationPermission() {
