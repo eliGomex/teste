@@ -52,7 +52,21 @@ video {
     justify-content: center;
 }
 
-#imagesContainer img {
-    max-width: 200px;
+.image-container {
+    position: relative;
+    display: inline-block;
     margin: 10px;
+}
+
+.gallery-image {
+    max-width: 200px;
+    display: block;
+}
+
+.image-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
 }

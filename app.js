@@ -39,19 +39,49 @@ if (document.getElementById('takePhoto')) {
 if (document.getElementById('goBack')) {
     const imagesContainer = document.getElementById('imagesContainer');
     const goBackButton = document.getElementById('goBack');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
 
     goBackButton.addEventListener('click', () => {
         window.location.href = 'index.html';
     });
 
+    deleteSelectedButton.addEventListener('click', () => {
+        deleteSelectedImages();
+    });
+
     function displaySavedImages() {
         imagesContainer.innerHTML = '';
         let images = JSON.parse(localStorage.getItem('images')) || [];
-        images.forEach((dataUrl) => {
+        images.forEach((dataUrl, index) => {
+            let div = document.createElement('div');
+            div.className = 'image-container';
+
             let img = document.createElement('img');
             img.src = dataUrl;
-            imagesContainer.appendChild(img);
+            img.className = 'gallery-image';
+
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'image-checkbox';
+            checkbox.dataset.index = index;
+
+            div.appendChild(img);
+            div.appendChild(checkbox);
+            imagesContainer.appendChild(div);
         });
+    }
+
+    function deleteSelectedImages() {
+        let images = JSON.parse(localStorage.getItem('images')) || [];
+        let checkboxes = document.querySelectorAll('.image-checkbox:checked');
+
+        checkboxes.forEach(checkbox => {
+            let index = checkbox.dataset.index;
+            images.splice(index, 1);
+        });
+
+        localStorage.setItem('images', JSON.stringify(images));
+        displaySavedImages();
     }
 
     window.onload = () => {
@@ -69,3 +99,4 @@ if ('serviceWorker' in navigator) {
             console.log('Falha ao registrar o Service Worker:', error);
         });
 }
+
