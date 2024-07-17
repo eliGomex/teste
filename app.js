@@ -1,3 +1,27 @@
+// Registro do Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then((registration) => {
+            console.log('Service Worker registrado com sucesso:', registration);
+        })
+        .catch((error) => {
+            console.log('Falha ao registrar o Service Worker:', error);
+        });
+}
+
+// Solicitar permissão para notificações
+function requestNotificationPermission() {
+    if (Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            if (permission !== 'granted') {
+                console.log('Permissão para notificações não foi concedida.');
+            }
+        });
+    }
+}
+
+requestNotificationPermission();
+
 // Para a página index.html
 if (document.getElementById('takePhoto')) {
     const video = document.getElementById('cameraStream');
@@ -22,6 +46,7 @@ if (document.getElementById('takePhoto')) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         saveImageToLocalStorage(canvas.toDataURL());
+        showNotification('Foto tirada', 'Sua foto foi tirada com sucesso!');
     });
 
     goToGalleryButton.addEventListener('click', () => {
@@ -32,6 +57,17 @@ if (document.getElementById('takePhoto')) {
         let images = JSON.parse(localStorage.getItem('images')) || [];
         images.push(dataUrl);
         localStorage.setItem('images', JSON.stringify(images));
+    }
+
+    function showNotification(title, body) {
+        if (Notification.permission === 'granted') {
+            navigator.serviceWorker.getRegistration().then(function(reg) {
+                reg.showNotification(title, {
+                    body: body,
+                    icon: '/icon-192x192.png',
+                });
+            });
+        }
     }
 }
 
@@ -88,15 +124,3 @@ if (document.getElementById('goBack')) {
         displaySavedImages();
     };
 }
-
-// Registro do Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-        .then((registration) => {
-            console.log('Service Worker registrado com sucesso:', registration);
-        })
-        .catch((error) => {
-            console.log('Falha ao registrar o Service Worker:', error);
-        });
-}
-
