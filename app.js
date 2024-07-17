@@ -20,21 +20,6 @@ if (document.getElementById('takePhoto')) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const index = (y * canvas.width + x) * 4;
-                const red = data[index];
-                const green = data[index + 1];
-                const blue = data[index + 2];
-
-                if (isRed(red, green, blue)) {
-                    markRedBlock(x, y);
-                }
-            }
-        }
 
         saveImageToLocalStorage(canvas.toDataURL());
     });
@@ -42,18 +27,6 @@ if (document.getElementById('takePhoto')) {
     goToGalleryButton.addEventListener('click', () => {
         window.location.href = 'gallery.html';
     });
-
-    function isRed(r, g, b) {
-        return r > 150 && g < 100 && b < 100;
-    }
-
-    function markRedBlock(x, y) {
-        context.beginPath();
-        context.arc(x, y, 50, 0, 2 * Math.PI);
-        context.lineWidth = 2;
-        context.strokeStyle = 'red';
-        context.stroke();
-    }
 
     function saveImageToLocalStorage(dataUrl) {
         let images = JSON.parse(localStorage.getItem('images')) || [];
