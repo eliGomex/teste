@@ -20,7 +20,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#gallery img {
+#galeria img {
     width: 100%;
     max-width: 200px;
     margin: 10px;
@@ -46,24 +46,24 @@ video {
     margin: 20px 0;
 }
 
-#imagesContainer {
+#containerImagens {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-.image-container {
+.containerImagem {
     position: relative;
     display: inline-block;
     margin: 10px;
 }
 
-.gallery-image {
+.imagemGaleria {
     max-width: 200px;
     display: block;
 }
 
-.image-checkbox {
+.checkboxImagem {
     position: absolute;
     top: 10px;
     left: 10px;

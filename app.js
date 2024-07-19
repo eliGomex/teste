@@ -10,37 +10,25 @@ if ('serviceWorker' in navigator) {
 }
 
 // Solicitar permissão para notificações
-function requestNotificationPermission() {
+function solicitarPermissaoNotificacao() {
     if (Notification.permission === 'default') {
-        Notification.requestPermission().then(permission => {
-            if (permission !== 'granted') {
+        Notification.requestPermission().then(permissao => {
+            if (permissao !== 'granted') {
                 console.log('Permissão para notificações não foi concedida.');
             }
         });
     }
 }
 
-requestNotificationPermission();
+solicitarPermissaoNotificacao();
 
-// Função para exibir notificações
-function showNotification(title, body) {
-    if (Notification.permission === 'granted') {
-        navigator.serviceWorker.getRegistration().then(function(reg) {
-            reg.showNotification(title, {
-                body: body,
-                icon: '/icon-192x192.png',
-            });
-        });
-    }
-}
-
-// Código para a página index.html
-if (document.getElementById('takePhoto')) {
-    const video = document.getElementById('cameraStream');
-    const canvas = document.getElementById('cameraCanvas');
-    const context = canvas.getContext('2d');
-    const takePhotoButton = document.getElementById('takePhoto');
-    const goToGalleryButton = document.getElementById('goToGallery');
+// Para a página index.html
+if (document.getElementById('tirarFoto')) {
+    const video = document.getElementById('transmissaoCamera');
+    const canvas = document.getElementById('canvasCamera');
+    const contexto = canvas.getContext('2d');
+    const botaoTirarFoto = document.getElementById('tirarFoto');
+    const botaoIrParaGaleria = document.getElementById('irParaGaleria');
 
     // Solicitar permissão para acessar a câmera
     navigator.mediaDevices.getUserMedia({ video: true })
@@ -52,77 +40,87 @@ if (document.getElementById('takePhoto')) {
         console.error("Erro ao acessar a câmera: ", err);
       });
 
-    takePhotoButton.addEventListener('click', () => {
+    botaoTirarFoto.addEventListener('click', () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        saveImageToLocalStorage(canvas.toDataURL());
-        showNotification('Foto tirada', 'Sua foto foi tirada com sucesso!');
+        salvarImagemNoLocalStorage(canvas.toDataURL());
+        mostrarNotificacao('Foto tirada', 'Sua foto foi tirada com sucesso!');
     });
 
-    goToGalleryButton.addEventListener('click', () => {
+    botaoIrParaGaleria.addEventListener('click', () => {
         window.location.href = 'gallery.html';
     });
 
-    function saveImageToLocalStorage(dataUrl) {
-        let images = JSON.parse(localStorage.getItem('images')) || [];
-        images.push(dataUrl);
-        localStorage.setItem('images', JSON.stringify(images));
+    function salvarImagemNoLocalStorage(dataUrl) {
+        let imagens = JSON.parse(localStorage.getItem('imagens')) || [];
+        imagens.push(dataUrl);
+        localStorage.setItem('imagens', JSON.stringify(imagens));
+    }
+
+    function mostrarNotificacao(titulo, corpo) {
+        if (Notification.permission === 'granted') {
+            navigator.serviceWorker.getRegistration().then(function(reg) {
+                reg.showNotification(titulo, {
+                    body: corpo,
+                    icon: '/icon-192x192.png',
+                });
+            });
+        }
     }
 }
 
-// Código para a página gallery.html
-if (document.getElementById('goBack')) {
-    const imagesContainer = document.getElementById('imagesContainer');
-    const goBackButton = document.getElementById('goBack');
-    const deleteSelectedButton = document.getElementById('deleteSelected');
+// Para a página gallery.html
+if (document.getElementById('voltar')) {
+    const containerImagens = document.getElementById('containerImagens');
+    const botaoVoltar = document.getElementById('voltar');
+    const botaoApagarSelecionadas = document.getElementById('apagarSelecionadas');
 
-    goBackButton.addEventListener('click', () => {
+    botaoVoltar.addEventListener('click', () => {
         window.location.href = 'index.html';
     });
 
-    deleteSelectedButton.addEventListener('click', () => {
-        deleteSelectedImages();
-        showNotification('Fotos apagadas', 'As fotos selecionadas foram apagadas com sucesso!');
+    botaoApagarSelecionadas.addEventListener('click', () => {
+        apagarImagensSelecionadas();
     });
 
-    function displaySavedImages() {
-        imagesContainer.innerHTML = '';
-        let images = JSON.parse(localStorage.getItem('images')) || [];
-        images.forEach((dataUrl, index) => {
+    function exibirImagensSalvas() {
+        containerImagens.innerHTML = '';
+        let imagens = JSON.parse(localStorage.getItem('imagens')) || [];
+        imagens.forEach((dataUrl, index) => {
             let div = document.createElement('div');
-            div.className = 'image-container';
+            div.className = 'containerImagem';
 
             let img = document.createElement('img');
             img.src = dataUrl;
-            img.className = 'gallery-image';
+            img.className = 'imagemGaleria';
 
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.className = 'image-checkbox';
+            checkbox.className = 'checkboxImagem';
             checkbox.dataset.index = index;
 
             div.appendChild(img);
             div.appendChild(checkbox);
-            imagesContainer.appendChild(div);
+            containerImagens.appendChild(div);
         });
     }
 
-    function deleteSelectedImages() {
-        let images = JSON.parse(localStorage.getItem('images')) || [];
-        let checkboxes = document.querySelectorAll('.image-checkbox:checked');
+    function apagarImagensSelecionadas() {
+        let imagens = JSON.parse(localStorage.getItem('imagens')) || [];
+        let checkboxes = document.querySelectorAll('.checkboxImagem:checked');
 
         checkboxes.forEach(checkbox => {
             let index = checkbox.dataset.index;
-            images.splice(index, 1);
+            imagens.splice(index, 1);
         });
 
-        localStorage.setItem('images', JSON.stringify(images));
-        displaySavedImages();
+        localStorage.setItem('imagens', JSON.stringify(imagens));
+        exibirImagensSalvas();
     }
 
     window.onload = () => {
-        displaySavedImages();
+        exibirImagensSalvas();
     };
 }
