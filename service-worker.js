@@ -25,29 +25,33 @@ self.addEventListener('install', event => {
 
 // Interceptação de solicitações de rede
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).then(
-                    networkResponse => {
-                        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+    if (event.request.url.startsWith(self.location.origin)) {
+        event.respondWith(
+            caches.match(event.request)
+                .then(response => {
+                    if (response) {
+                        return response;
+                    }
+                    return fetch(event.request).then(
+                        networkResponse => {
+                            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                                return networkResponse;
+                            }
+                            const responseToCache = networkResponse.clone();
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
                             return networkResponse;
                         }
-                        const responseToCache = networkResponse.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, responseToCache);
-                        });
-                        return networkResponse;
-                    }
-                );
-            })
-            .catch(error => {
-                console.error('Falha ao buscar a solicitação:', error);
-            })
-    );
+                    );
+                })
+                .catch(error => {
+                    console.error('Falha ao buscar a solicitação:', error);
+                })
+        );
+    } else {
+        event.respondWith(fetch(event.request));
+    }
 });
 
 // Ativação do Service Worker
